@@ -3,6 +3,7 @@ import { registerBidder } from '../src/adapters/bidderFactory.js';
 import { BANNER, VIDEO, NATIVE } from '../src/mediaTypes.js';
 import {config} from '../src/config.js';
 import { Renderer } from '../src/Renderer.js';
+import { convertOrtbRequestToProprietaryNative } from '../src/native.js';
 
 const BIDDER_CODE = 'pubmatic';
 const LOG_WARN_PREFIX = 'PubMatic: ';
@@ -1085,6 +1086,9 @@ export const spec = {
    * @return ServerRequest Info describing the request to the server.
    */
   buildRequests: (validBidRequests, bidderRequest) => {
+    // convert Native ORTB definition to old-style prebid native definition
+    validBidRequests = convertOrtbRequestToProprietaryNative(validBidRequests);
+
     if (bidderRequest && MARKETPLACE_PARTNERS.includes(bidderRequest.bidderCode)) {
       // We have got the buildRequests function call for Marketplace Partners
       logInfo('For all publishers using ' + bidderRequest.bidderCode + ' bidder, the PubMatic bidder will also be enabled so PubMatic server will respond back with the bids that needs to be submitted for PubMatic and ' + bidderRequest.bidderCode + ' in the network call sent by PubMatic bidder. Hence we do not want to create a network call for ' + bidderRequest.bidderCode + '. This way we are trying to save a network call from browser.');

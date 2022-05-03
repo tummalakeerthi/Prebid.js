@@ -403,7 +403,7 @@ function getNativeKeys(adUnit) {
   }
 }
 
-const { ASSET_TYPES, IMAGE_TYPES, PREBID_NATIVE_DATA_KEYS_TO_ORTB } = CONSTANTS;
+const { NATIVE_ASSET_TYPES, NATIVE_IMAGE_TYPES, PREBID_NATIVE_DATA_KEYS_TO_ORTB } = CONSTANTS;
 
 /**
  * converts Prebid legacy native assets request to OpenRTB format
@@ -432,7 +432,7 @@ export function toOrtbNativeRequest(nativeAssets) {
     // data cases
     if (key in PREBID_NATIVE_DATA_KEYS_TO_ORTB) {
       ortbAsset.data = {
-        type: ASSET_TYPES[PREBID_NATIVE_DATA_KEYS_TO_ORTB[key]]
+        type: NATIVE_ASSET_TYPES[PREBID_NATIVE_DATA_KEYS_TO_ORTB[key]]
       }
       if (asset.len) {
         ortbAsset.data.len = asset.len;
@@ -440,7 +440,7 @@ export function toOrtbNativeRequest(nativeAssets) {
     // icon or image case
     } else if (key === 'icon' || key === 'image') {
       ortbAsset.img = {
-        type: key === 'icon' ? IMAGE_TYPES.ICON : IMAGE_TYPES.MAIN,
+        type: key === 'icon' ? NATIVE_IMAGE_TYPES.ICON : NATIVE_IMAGE_TYPES.MAIN,
       }
       // if min_width and min_height are defined in aspect_ratio, they are preferred
       if (asset.aspect_ratios) {
@@ -527,13 +527,13 @@ export function fromOrtbNativeRequest(openRTBRequest) {
         }
       }
 
-      if (asset.img.type === IMAGE_TYPES.MAIN) {
+      if (asset.img.type === NATIVE_IMAGE_TYPES.MAIN) {
         oldNativeObject.image = image;
       } else {
         oldNativeObject.icon = image;
       }
     } else if (asset.data) {
-      let assetType = Object.keys(ASSET_TYPES).find(k => ASSET_TYPES[k] === asset.data.type);
+      let assetType = Object.keys(NATIVE_ASSET_TYPES).find(k => NATIVE_ASSET_TYPES[k] === asset.data.type);
       let prebidAssetName = Object.keys(PREBID_NATIVE_DATA_KEYS_TO_ORTB).find(k => PREBID_NATIVE_DATA_KEYS_TO_ORTB[k] === assetType);
       oldNativeObject[prebidAssetName] = {
         required: asset.required ? Boolean(asset.required) : false,
@@ -588,7 +588,7 @@ export function toOrtbNativeResponse(legacyResponse, ortbRequest) {
         break;
       case 'image':
       case 'icon':
-        const imageType = key === 'image' ? IMAGE_TYPES.MAIN : IMAGE_TYPES.ICON;
+        const imageType = key === 'image' ? NATIVE_IMAGE_TYPES.MAIN : NATIVE_IMAGE_TYPES.ICON;
         const imageAsset = ortbRequest.assets.find(asset => asset.img != null && asset.img.type == imageType);
         imageAsset.img = {
           url: value
@@ -611,7 +611,7 @@ export function toOrtbNativeResponse(legacyResponse, ortbRequest) {
         break;
       default:
         if (key in PREBID_NATIVE_DATA_KEYS_TO_ORTB) {
-          const dataAsset = ortbRequest.assets.find(asset => asset.data != null && asset.data.type === ASSET_TYPES[PREBID_NATIVE_DATA_KEYS_TO_ORTB[key]]);
+          const dataAsset = ortbRequest.assets.find(asset => asset.data != null && asset.data.type === NATIVE_ASSET_TYPES[PREBID_NATIVE_DATA_KEYS_TO_ORTB[key]]);
           dataAsset.data = {
             value
           };
